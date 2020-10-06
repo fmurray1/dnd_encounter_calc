@@ -1,40 +1,61 @@
+from typing import Tuple
+import cr_classes as cr
+
 class Enemy:
     """
-    This is a generic class of a monster in the Monster guide, it takes a name and XP
+    This is a generic class of a monster in the Monster guide, it takes a name and a cr level
     """
-    def __init__(self, name, xp):
+    def __init__(self, name, cr):
         self._enemy_name = name
-        self._xp = xp
+        cr_base = cr.classmap.get(cr)
+        if cr_base is not None:
+            self.cr: cr.CR = cr_base()
+        else:
+            raise ValueError("CR value was not valid for an enemy")
     
     @property
     def xp(self):
-        return self._xp
+        return self.cr.xp()
 
     def __repl__(self):
-        return "{} at {} xp".format(self._enemy_name, self._xp)
+        return "{} at {}".format(self._enemy_name, self.cr)
 
 
 class Encounter:
-    def __init__(self):
+    def __init__(self, name):
         self._total_enemies = 0
-        self._list_of_enemies = [tuple]
-
-    @property
-    def total_enemies(self):
-        return self._total_enemies
-    
-    @property
-    def enemies(self):
-        return self._list_of_enemies
-
+        self._list_of_enemies: Tuple(int, Enemy) = []
+        self.max_xp = 0
+        self.name = name
 
     def add_enemies(self, count:int, enemy_class:Enemy):
         self._list_of_enemies.append((count, enemy_class))
         self._total_enemies += count
     
     def __repl__(self):
-        repl_string = ''
+        repl_string = '{}:\n\t'.format(self.name)
         for c, enemy in self._list_of_enemies:
-            repl_string += "{} {}".format(c, enemy)
+            repl_string += "\t{} {}\n".format(c, enemy)
         return repl_string
+    
+    def xp_calc(self):
+        total_xp = 0
+        modifier = 0
+
+        if self._total_enemies == 2:
+            modifier = 1.5
+        elif self._total_enemies >= 3 and self._total_enemies <= 6:
+            modifier = 2
+        elif self._total_enemies >= 7 and self._total_enemies <= 10:
+            modifier = 2.5
+        elif self._total_enemies >= 11 and self._total_enemies <= 14:
+            modifier = 3
+        elif self._total_enemies > 14:
+            modifier = 4
+        else:
+            modifier = 1
+
+        for _, enemy in self._list_of_enemies:
+            total_xp += enemy.xp()
+        return total_xp*modifier
 
