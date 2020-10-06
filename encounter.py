@@ -29,6 +29,8 @@ class Encounter:
         self.name = name
 
     def add_enemies(self, count:int, enemy_class:Enemy):
+        if enemy_class is None:
+            raise ValueError("No enemy class of that type")
         self._list_of_enemies.append((count, enemy_class))
         self._total_enemies += count
     
