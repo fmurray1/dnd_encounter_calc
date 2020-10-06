@@ -5,9 +5,9 @@ class Enemy:
     """
     This is a generic class of a monster in the Monster guide, it takes a name and a cr level
     """
-    def __init__(self, name, cr):
+    def __init__(self, name, cr_str):
         self._enemy_name = name
-        cr_base = cr.classmap.get(cr)
+        cr_base = cr.classmap.get(cr_str)
         if cr_base is not None:
             self.cr: cr.CR = cr_base()
         else:
@@ -15,11 +15,13 @@ class Enemy:
     
     @property
     def xp(self):
-        return self.cr.xp()
+        return self.cr.xp
 
     def __repl__(self):
         return "{} at {}".format(self._enemy_name, self.cr)
 
+    def __str__(self):
+        return self.__repl__()
 
 class Encounter:
     def __init__(self, name):
@@ -35,12 +37,15 @@ class Encounter:
         self._total_enemies += count
     
     def __repl__(self):
-        repl_string = 'Encounter {}:\n\t'.format(self.name)
+        repl_string = 'Encounter {}:\n'.format(self.name)
         for c, enemy in self._list_of_enemies:
             repl_string += "\t{} {}\n".format(c, enemy)
         repl_string += 'Total/Max XP: {}'.format(self.max_xp)
         return repl_string
     
+    def __str__(self):
+        return self.__repl__()
+
     def xp_calc(self):
         total_xp = 0
         modifier = 0
@@ -58,7 +63,7 @@ class Encounter:
         else:
             modifier = 1
 
-        for _, enemy in self._list_of_enemies:
-            total_xp += enemy.xp()
+        for count, enemy in self._list_of_enemies:
+            total_xp += count*enemy.xp
         self.max_xp = total_xp*modifier
 

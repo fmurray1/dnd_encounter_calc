@@ -1,40 +1,47 @@
 from typing import Dict
 import json
 import click
+from click_repl import register_repl
 from encounter import Encounter, Enemy
 
 
-enemy_list = Dict[str, Enemy] = {}
-encounter_list: Dict[str, Encounter] = {}
-active_encounter: Encounter = None
+enemy_list: Dict[str, Enemy] = {}
+active_encounter: Encounter = Encounter('default')
+encounter_list: Dict[str, Encounter] = {'default': active_encounter}
 
+@click.group()
+def cli():
+    pass
 
-@click.command('calc')
-@click.option('--encounter', '-e', default=active_encounter.name())
+@cli.command('calc')
+@click.option('--encounter', '-e', default=active_encounter.name)
 def click_calc(encounter):
+    global encounter_list
     encounter_to_calc = encounter_list.get(encounter.lower())
     if encounter_to_calc is not None:
         encounter_to_calc.xp_calc()
-        click.echo(encounter_to_calc)
+        click.echo(encounter_to_calc.__repl__())
     else:
         click.echo("No encounter named {} found".format(encounter))
 
-@click.command()
+@cli.command()
 @click.option('--name', '-n', type=str)
 def create_encounter(name):
+    global encounter_list
     name= name.lower()
     encounter_list[name] = Encounter(name)
     click.echo('Successfully created encounter {}'.format(name))
 
 
-@click.command()
+@cli.command()
 @click.option('--name', '-n', required=True, type=str)
 @click.option('--cr', required=True, type=int)
 def create_enemy(name, cr):
     name= name.lower()
-    enemy_list[name:Enemy(name, cr)]
+    click.echo(type(name))
+    enemy_list[name] = Enemy(name, str(cr))
 
-@click.command()
+@cli.command()
 @click.option('--name', '-n', required=True, type=str)
 @click.option('--count', '-c', type=int, default=1)
 def add_enemy(name, count):
@@ -42,7 +49,7 @@ def add_enemy(name, count):
     active_encounter.add_enemies(count, enemy_list.get(name))
 
 
-@click.command()
+@cli.command()
 @click.option('--name', '-n', type=str, required=True)
 def select_encounter(name):
     name= name.lower()
@@ -55,27 +62,30 @@ def select_encounter(name):
     else:
         click.echo("Encounter named {} not found".format(name))
 
-@click.command()
+@cli.command()
 def calc_all():
     global encounter_list
     encounter_string = 'All current encounters:\n'
     for _, en in encounter_list.items():
         en.xp_calc()
-        encounter_string += en 
+        encounter_string += str(en)
     click.echo(encounter_string)
 
 
-@click.command()
+@cli.command()
 @click.argument('enemy_json', type=click.File('r'))
 def load_enemies(enemy_json):
     global enemy_list
     enemy_list = json.loads(enemy_json.read())
 
-@click.command()
+@cli.command()
 @click.argument('path', type=click.File('w'))
 def save_enemies(path):
     global enemy_list
     path.write(json.dumps(enemy_list))
 
+
+register_repl(cli)
+
 if __name__ == "__main__":
-    pass
+    cli()

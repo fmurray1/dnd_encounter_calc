@@ -13,8 +13,11 @@ class CR(ABC):
     def cr(self):
         return self._cr
     
-    def __repr__(self):
+    def __repl__(self):
         return 'CR: {} XP: {}'.format(self._cr, self._xp)
+
+    def __str__(self):
+        return self.__repl__()
 
 class CR0(CR):
             def __init__(self):
