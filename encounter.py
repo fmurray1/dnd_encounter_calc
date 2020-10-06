@@ -35,9 +35,10 @@ class Encounter:
         self._total_enemies += count
     
     def __repl__(self):
-        repl_string = '{}:\n\t'.format(self.name)
+        repl_string = 'Encounter {}:\n\t'.format(self.name)
         for c, enemy in self._list_of_enemies:
             repl_string += "\t{} {}\n".format(c, enemy)
+        repl_string += 'Total/Max XP: {}'.format(self.max_xp)
         return repl_string
     
     def xp_calc(self):
@@ -59,5 +60,5 @@ class Encounter:
 
         for _, enemy in self._list_of_enemies:
             total_xp += enemy.xp()
-        return total_xp*modifier
+        self.max_xp = total_xp*modifier
 

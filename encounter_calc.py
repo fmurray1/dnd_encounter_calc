@@ -12,19 +12,19 @@ active_encounter: Encounter = None
 @click.command('calc')
 @click.option('--encounter', '-e', default=active_encounter.name())
 def click_calc(encounter):
-    encounter_to_calc = encounter_list.get(encounter)
+    encounter_to_calc = encounter_list.get(encounter.lower())
     if encounter_to_calc is not None:
         encounter_to_calc.xp_calc()
-        print(encounter_to_calc)
+        click.echo(encounter_to_calc)
     else:
-        print("No encounter named {} found".format(encounter))
+        click.echo("No encounter named {} found".format(encounter))
 
 @click.command()
 @click.option('--name', '-n', type=str)
 def create_encounter(name):
     name= name.lower()
     encounter_list[name] = Encounter(name)
-    print('Successfully created encounter {}'.format(name))
+    click.echo('Successfully created encounter {}'.format(name))
 
 
 @click.command()
@@ -51,9 +51,9 @@ def select_encounter(name):
     tmp_encounter = encounter_list.get(name)
     if tmp_encounter is not None:
         active_encounter =  tmp_encounter
-        print("Active encounter set to {}".format(name))
+        click.echo("Active encounter set to {}".format(name))
     else:
-        print("Encounter named {} not found".format(name))
+        click.echo("Encounter named {} not found".format(name))
 
 @click.command()
 def calc_all():
@@ -62,7 +62,7 @@ def calc_all():
     for _, en in encounter_list.items():
         en.xp_calc()
         encounter_string += en 
-    print(encounter_string)
+    click.echo(encounter_string)
 
 
 @click.command()
