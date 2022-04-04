@@ -7,5 +7,5 @@ This has morphed into a way more complex idea than it started out as
 ## To-Do
 - Show the active encounter
 - list commands
--- list encounters
--- list enemies/monsters
+  - list encounters
+  - list enemies/monsters
